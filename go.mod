@@ -1,4 +1,4 @@
-module BloomFilter
+module github.com/DGHeroin/BloomFilter
 
 go 1.15
 
