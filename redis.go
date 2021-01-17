@@ -4,6 +4,7 @@ import (
     "context"
     "github.com/go-redis/redis/v8"
     "io"
+    "io/ioutil"
 )
 
 type redisBitSet struct {
@@ -27,10 +28,27 @@ func (self *redisBitSet) get(offset int64) (int64, error) {
     cmd := self.conn.GetBit(context.Background(), self.key, int64(offset))
     return cmd.Val(), cmd.Err()
 }
-
+func (self *redisBitSet) del(offset int64) error {
+    cmd := self.conn.SetBit(context.Background(), self.key, int64(offset), 0)
+    return cmd.Err()
+}
 func (self *redisBitSet) Load(r io.Reader) (int64, error) {
-    return 0, nil
+    data, err := ioutil.ReadAll(r)
+    if err != nil {
+        return 0, err
+    }
+    cmd := self.conn.Set(context.Background(), self.key, data, 0)
+    return 0, cmd.Err()
 }
 func (self *redisBitSet) Save(w io.Writer) (int64, error) {
-    return 0, nil
+    cmd := self.conn.Get(context.Background(), self.key)
+    if cmd.Err() != nil {
+        return 0, cmd.Err()
+    }
+    data, err := cmd.Bytes()
+    if err != nil {
+        return 0, err
+    }
+    n, err := w.Write(data)
+    return int64(n), err
 }

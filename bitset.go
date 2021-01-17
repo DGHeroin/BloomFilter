@@ -26,6 +26,10 @@ func (self *memBitSet) get(offset int64) (int64, error) {
     }
     return 0, nil
 }
+func (self*memBitSet) del(at int64) error {
+    self.bs.DeleteAt(uint(at))
+    return nil
+}
 func (self*memBitSet) Load(r io.Reader) (int64, error) {
     return self.bs.ReadFrom(r)
 }
