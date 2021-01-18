@@ -19,16 +19,16 @@ func NewRedisBitSet(key string, conn *redis.Conn) BitSet {
     }
     return r
 }
-func (self *redisBitSet) set(offset int64) error {
+func (self *redisBitSet) set(offset uint64) error {
     cmd := self.conn.SetBit(context.Background(), self.key, int64(offset), 1)
     return cmd.Err()
 }
 
-func (self *redisBitSet) get(offset int64) (int64, error) {
+func (self *redisBitSet) get(offset uint64) (uint64, error) {
     cmd := self.conn.GetBit(context.Background(), self.key, int64(offset))
-    return cmd.Val(), cmd.Err()
+    return uint64(cmd.Val()), cmd.Err()
 }
-func (self *redisBitSet) del(offset int64) error {
+func (self *redisBitSet) del(offset uint64) error {
     cmd := self.conn.SetBit(context.Background(), self.key, int64(offset), 0)
     return cmd.Err()
 }

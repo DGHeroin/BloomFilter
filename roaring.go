@@ -1,7 +1,7 @@
 package BloomFilter
 
 import (
-    "github.com/RoaringBitmap/roaring"
+    roaring "github.com/RoaringBitmap/roaring/roaring64"
     "io"
 )
 
@@ -13,19 +13,19 @@ func NewSmallMemoryBitSet() BitSet {
     r := &smallMemBitSet{}
     return r
 }
-func (self *smallMemBitSet) set(offset int64) error {
-    self.bs.Add(uint32(offset))
+func (self *smallMemBitSet) set(offset uint64) error {
+    self.bs.Add(offset)
     return nil
 }
-func (self *smallMemBitSet) get(offset int64) (int64, error) {
-    ok := self.bs.Contains(uint32(offset))
+func (self *smallMemBitSet) get(offset uint64) (uint64, error) {
+    ok := self.bs.Contains(offset)
     if ok {
         return 1, nil
     }
     return 0, nil
 }
-func (self*smallMemBitSet) del(offset int64) error {
-    self.bs.Remove(uint32(offset))
+func (self*smallMemBitSet) del(offset uint64) error {
+    self.bs.Remove(offset)
     return ErrNotSupport
 }
 func (self*smallMemBitSet) Load(r io.Reader) (int64, error) {

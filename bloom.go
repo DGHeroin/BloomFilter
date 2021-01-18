@@ -15,9 +15,9 @@ type Bloom struct {
 }
 
 type BitSet interface {
-    set(offset int64) error
-    get(offset int64) (int64, error)
-    del(offset int64) error
+    set(offset uint64) error
+    get(offset uint64) (uint64, error)
+    del(offset uint64) error
     Load(r io.Reader) (int64, error)
     Save(w io.Writer) (int64, error)
 }
@@ -32,7 +32,7 @@ func NewBloom(bs BitSet) *Bloom {
 func (self *Bloom) Add(str string) error {
     for _, fn := range self.fns {
         offset := fn(str)
-        if err := self.bs.set(int64(offset)); err != nil {
+        if err := self.bs.set(offset); err != nil {
             return err
         }
     }
@@ -40,10 +40,10 @@ func (self *Bloom) Add(str string) error {
 }
 
 func (self *Bloom) Exists(str string) bool {
-    var a int64 = 1
+    var a uint64 = 1
     for _, fn := range self.fns {
         offset := fn(str)
-        val, err := self.bs.get(int64(offset))
+        val, err := self.bs.get(offset)
         if err != nil {
             return false
         }
@@ -54,12 +54,12 @@ func (self *Bloom) Exists(str string) bool {
     return true
 }
 
-func (self *Bloom) AddInt(offset int64) error {
+func (self *Bloom) AddInt(offset uint64) error {
     return self.bs.set(offset)
 }
 
-func (self *Bloom) ExistsInt(offset int64) bool {
-    var a int64 = 1
+func (self *Bloom) ExistsInt(offset uint64) bool {
+    var a uint64 = 1
     val, err := self.bs.get(offset)
     if err != nil {
         return false
@@ -70,14 +70,14 @@ func (self *Bloom) ExistsInt(offset int64) bool {
     return true
 }
 
-func (self*Bloom)DelInt(offset int64) error {
+func (self*Bloom)DelInt(offset uint64) error {
     return self.bs.del(offset)
 }
 
 func (self*Bloom)DelString(str string) error {
     for _, fn := range self.fns {
         offset := fn(str)
-        if err := self.bs.del(int64(offset)); err != nil {
+        if err := self.bs.del(offset); err != nil {
             return err
         }
     }
