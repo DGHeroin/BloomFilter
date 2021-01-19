@@ -7,11 +7,11 @@ import (
 
 func main()  {
     bs := BloomFilter.NewMemoryBitSet()
-    filter := BloomFilter.NewBloom(bs)
-    
+    filter := BloomFilter.NewFilter(bs)
+
     filter.Add("QAQ")
     test := func(key string) {
-        log.Println(key, filter.Exists(key))
+       log.Println(key, filter.Exists(key))
     }
     test("QAQ")
     test("PS")

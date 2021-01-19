@@ -9,7 +9,7 @@ var (
     ErrNotSupport = errors.New("not support")
 )
 
-type Bloom struct {
+type Filter struct {
     bs  BitSet
     fns []HashFunc
 }
@@ -22,14 +22,14 @@ type BitSet interface {
     Save(w io.Writer) (int64, error)
 }
 
-func NewBloom(bs BitSet) *Bloom {
-    return &Bloom{
+func NewFilter(bs BitSet) *Filter {
+    return &Filter{
         bs:  bs,
         fns: NewHashFunc(),
     }
 }
 
-func (self *Bloom) Add(str string) error {
+func (self *Filter) Add(str string) error {
     for _, fn := range self.fns {
         offset := fn(str)
         if err := self.bs.set(offset); err != nil {
@@ -39,7 +39,7 @@ func (self *Bloom) Add(str string) error {
     return nil
 }
 
-func (self *Bloom) Exists(str string) bool {
+func (self *Filter) Exists(str string) bool {
     var a uint64 = 1
     for _, fn := range self.fns {
         offset := fn(str)
@@ -54,11 +54,11 @@ func (self *Bloom) Exists(str string) bool {
     return true
 }
 
-func (self *Bloom) AddInt(offset uint64) error {
+func (self *Filter) AddInt(offset uint64) error {
     return self.bs.set(offset)
 }
 
-func (self *Bloom) ExistsInt(offset uint64) bool {
+func (self *Filter) ExistsInt(offset uint64) bool {
     var a uint64 = 1
     val, err := self.bs.get(offset)
     if err != nil {
@@ -70,11 +70,11 @@ func (self *Bloom) ExistsInt(offset uint64) bool {
     return true
 }
 
-func (self*Bloom)DelInt(offset uint64) error {
+func (self *Filter) DelInt(offset uint64) error {
     return self.bs.del(offset)
 }
 
-func (self*Bloom)DelString(str string) error {
+func (self *Filter) DelString(str string) error {
     for _, fn := range self.fns {
         offset := fn(str)
         if err := self.bs.del(offset); err != nil {

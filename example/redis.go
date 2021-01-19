@@ -13,7 +13,7 @@ func main()  {
     })
     conn := client.Conn(context.Background())
     bs := BloomFilter.NewRedisBitSet("online_users", conn)
-    filter := BloomFilter.NewBloom(bs)
+    filter := BloomFilter.NewFilter(bs)
 
     filter.Add("QAQ")
     test := func(key string) {

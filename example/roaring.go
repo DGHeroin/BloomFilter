@@ -7,7 +7,7 @@ import (
 
 func main()  {
     bs := BloomFilter.NewSmallMemoryBitSet()
-    filter := BloomFilter.NewBloom(bs)
+    filter := BloomFilter.NewFilter(bs)
     
     filter.Add("QAQ")
     test := func(key string) {
