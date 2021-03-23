@@ -12,17 +12,24 @@ func main()  {
         Addr: "localhost:6379",
     })
     conn := client.Conn(context.Background())
+    if cmd := conn.Ping(context.Background()); cmd.Err() != nil {
+        log.Println(cmd.Err())
+        return
+    }
     bs := BloomFilter.NewRedisBitSet("online_users", conn)
     filter := BloomFilter.NewFilter(bs)
 
-    filter.Add("QAQ")
+    filter.Add("111")
+    filter.Add("222")
     test := func(key string) {
-        log.Println(key, filter.Exists(key))
+       log.Println(key, filter.Exists(key))
     }
-    test("QAQ")
-    test("PS")
+    test("111")
+    test("333")
     log.Println("==========")
-    filter.DelString("QAQ")
-    test("QAQ")
-    test("PS")
+    filter.DelString("111")
+    test("111")
+    test("222")
+
+    log.Println("Count:", filter.Count())
 }

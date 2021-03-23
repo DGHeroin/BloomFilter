@@ -1,9 +1,16 @@
 package BloomFilter
 
+import "hash/fnv"
+
 type HashFunc func(string) uint64
 
 func NewHashFunc() []HashFunc {
-    return []HashFunc{mBKDRHash, mSDBMHash, mDJBHash}
+    //return []HashFunc{mBKDRHash, mSDBMHash, mDJBHash}
+    return []HashFunc{mFNV}
+}
+
+func NewHashFunc32() []HashFunc {
+    return []HashFunc{mFNV32}
 }
 
 func mBKDRHash(str string) uint64 {
@@ -27,4 +34,15 @@ func mDJBHash(str string) uint64 {
         hash = ((hash << 5) + hash) + uint64(str[i])
     }
     return hash & 0x7FFFFFFF
+}
+func mFNV(str string) uint64 {
+    f := fnv.New64()
+    f.Write([]byte(str))
+    return f.Sum64()
+}
+
+func mFNV32(str string) uint64 {
+    f := fnv.New32()
+    f.Write([]byte(str))
+    return uint64(f.Sum32())
 }

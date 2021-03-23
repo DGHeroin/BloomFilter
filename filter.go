@@ -20,21 +20,29 @@ type BitSet interface {
     del(offset uint64) error
     Load(r io.Reader) (int64, error)
     Save(w io.Writer) (int64, error)
+    count() uint64
+    IsUint64() bool
 }
 
 func NewFilter(bs BitSet) *Filter {
-    return &Filter{
+    filter := &Filter{
         bs:  bs,
         fns: NewHashFunc(),
     }
+    if bs.IsUint64() {
+       filter.fns = NewHashFunc()
+    } else {
+        filter.fns = NewHashFunc32()
+    }
+    return filter
 }
 
 func (self *Filter) Add(str string) error {
     for _, fn := range self.fns {
-        offset := fn(str)
-        if err := self.bs.set(offset); err != nil {
-            return err
-        }
+       offset := fn(str)
+       if err := self.bs.set(offset); err != nil {
+           return err
+       }
     }
     return nil
 }
@@ -82,4 +90,8 @@ func (self *Filter) DelString(str string) error {
         }
     }
     return nil
+}
+
+func (self *Filter) Count() uint64 {
+    return self.bs.count()
 }

@@ -7,6 +7,7 @@ import (
 
 //
 type memBitSet struct {
+
     bs bitset.BitSet
 }
 
@@ -29,6 +30,12 @@ func (self *memBitSet) get(offset uint64) (uint64, error) {
 func (self*memBitSet) del(at uint64) error {
     self.bs.DeleteAt(uint(at))
     return nil
+}
+func (self*memBitSet) count() uint64 {
+    return uint64(self.bs.Count())
+}
+func (self *memBitSet) IsUint64() bool {
+    return false
 }
 func (self*memBitSet) Load(r io.Reader) (int64, error) {
     return self.bs.ReadFrom(r)
