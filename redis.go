@@ -2,6 +2,7 @@ package BloomFilter
 
 import (
     "context"
+    "fmt"
     "github.com/go-redis/redis/v8"
     "io"
     "io/ioutil"
@@ -64,4 +65,39 @@ func (self *redisBitSet) Save(w io.Writer) (int64, error) {
     }
     n, err := w.Write(data)
     return int64(n), err
+}
+
+func (self *redisBitSet) AND(set BitSet) {
+    other, ok := set.(*redisBitSet)
+    if !ok {
+        return
+    }
+    destKey := fmt.Sprintf("bitset::and:%v:%v", self.key, other.key)
+    self.conn.BitOpAnd(context.Background(), destKey, self.key, other.key)
+}
+
+func (self *redisBitSet) OR(set BitSet) {
+    other, ok := set.(*redisBitSet)
+    if !ok {
+        return
+    }
+    destKey := fmt.Sprintf("bitset::or:%v:%v", self.key, other.key)
+    self.conn.BitOpOr(context.Background(), destKey, self.key, other.key)
+}
+
+func (self *redisBitSet) XOR(set BitSet) {
+    other, ok := set.(*redisBitSet)
+    if !ok {
+        return
+    }
+    destKey := fmt.Sprintf("bitset::xor:%v:%v", self.key, other.key)
+    self.conn.BitOpXor(context.Background(), destKey, self.key, other.key)
+}
+func (self *redisBitSet) NOT(set BitSet) {
+    other, ok := set.(*redisBitSet)
+    if !ok {
+        return
+    }
+    destKey := fmt.Sprintf("bitset::not:%v:%v", self.key, other.key)
+    self.conn.BitOpNot(context.Background(), destKey, self.key, other.key)
 }

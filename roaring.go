@@ -6,11 +6,13 @@ import (
 )
 
 type smallMemBitSet struct {
-    bs roaring.Bitmap
+    bs *roaring.Bitmap
 }
 
 func NewSmallMemoryBitSet() BitSet {
-    r := &smallMemBitSet{}
+    r := &smallMemBitSet{
+        bs: &roaring.Bitmap{},
+    }
     return r
 }
 func (self *smallMemBitSet) set(offset uint64) error {
@@ -24,19 +26,51 @@ func (self *smallMemBitSet) get(offset uint64) (uint64, error) {
     }
     return 0, nil
 }
-func (self*smallMemBitSet) del(offset uint64) error {
+func (self *smallMemBitSet) del(offset uint64) error {
     self.bs.Remove(offset)
     return ErrNotSupport
 }
-func (self*smallMemBitSet) count() uint64 {
+func (self *smallMemBitSet) count() uint64 {
     return self.bs.GetCardinality()
 }
 func (self *smallMemBitSet) IsUint64() bool {
     return true
 }
-func (self*smallMemBitSet) Load(r io.Reader) (int64, error) {
+func (self *smallMemBitSet) Load(r io.Reader) (int64, error) {
     return self.bs.ReadFrom(r)
 }
-func (self*smallMemBitSet) Save(w io.Writer) (int64, error) {
+func (self *smallMemBitSet) Save(w io.Writer) (int64, error) {
     return self.bs.WriteTo(w)
+}
+
+func (self *smallMemBitSet) AND(set BitSet) {
+    other, ok := set.(*smallMemBitSet)
+    if !ok {
+        return
+    }
+    self.bs.And(other.bs)
+}
+
+func (self *smallMemBitSet) OR(set BitSet) {
+    other, ok := set.(*smallMemBitSet)
+    if !ok {
+        return
+    }
+    self.bs.Or(other.bs)
+}
+
+func (self *smallMemBitSet) XOR(set BitSet) {
+    other, ok := set.(*smallMemBitSet)
+    if !ok {
+        return
+    }
+    self.bs.Xor(other.bs)
+}
+
+func (self *smallMemBitSet) Not(set BitSet) {
+    other, ok := set.(*smallMemBitSet)
+    if !ok {
+        return
+    }
+    self.bs.AndNot()
 }

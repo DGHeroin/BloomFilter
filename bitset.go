@@ -7,7 +7,6 @@ import (
 
 //
 type memBitSet struct {
-
     bs bitset.BitSet
 }
 
@@ -27,19 +26,31 @@ func (self *memBitSet) get(offset uint64) (uint64, error) {
     }
     return 0, nil
 }
-func (self*memBitSet) del(at uint64) error {
+func (self *memBitSet) del(at uint64) error {
     self.bs.DeleteAt(uint(at))
     return nil
 }
-func (self*memBitSet) count() uint64 {
+func (self *memBitSet) count() uint64 {
     return uint64(self.bs.Count())
 }
 func (self *memBitSet) IsUint64() bool {
     return false
 }
-func (self*memBitSet) Load(r io.Reader) (int64, error) {
+func (self *memBitSet) Load(r io.Reader) (int64, error) {
     return self.bs.ReadFrom(r)
 }
-func (self*memBitSet) Save(w io.Writer) (int64, error) {
+func (self *memBitSet) Save(w io.Writer) (int64, error) {
     return self.bs.WriteTo(w)
+}
+
+func (self *memBitSet) AND(set BitSet) {
+    return
+}
+
+func (self *memBitSet) OR(set BitSet) {
+    return
+}
+
+func (self *memBitSet) XOR(set BitSet) {
+    return
 }

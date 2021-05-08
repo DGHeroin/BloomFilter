@@ -22,6 +22,9 @@ type BitSet interface {
     Save(w io.Writer) (int64, error)
     count() uint64
     IsUint64() bool
+    AND(set BitSet)
+    OR(set BitSet)
+    XOR(set BitSet)
 }
 
 func NewFilter(bs BitSet) *Filter {
@@ -30,7 +33,7 @@ func NewFilter(bs BitSet) *Filter {
         fns: NewHashFunc(),
     }
     if bs.IsUint64() {
-       filter.fns = NewHashFunc()
+        filter.fns = NewHashFunc()
     } else {
         filter.fns = NewHashFunc32()
     }
@@ -39,10 +42,10 @@ func NewFilter(bs BitSet) *Filter {
 
 func (self *Filter) Add(str string) error {
     for _, fn := range self.fns {
-       offset := fn(str)
-       if err := self.bs.set(offset); err != nil {
-           return err
-       }
+        offset := fn(str)
+        if err := self.bs.set(offset); err != nil {
+            return err
+        }
     }
     return nil
 }
